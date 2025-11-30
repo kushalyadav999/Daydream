@@ -1,0 +1,277 @@
+<!-- FULL PROJECT CODE: Daydream Design (Login + Dashboard + Logo Added) -->
+<!-- ============================ -->
+<!-- index.html (Login Page) -->
+<!-- ============================ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daydream Design — Login</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="login-body">
+
+<div class="login-card">
+    <img src="assets/logo.png" class="login-logo" />
+    <h2>Welcome to Daydream Design</h2>
+    <p class="muted">AI Interior Visualizer</p>
+
+    <button id="google-login" class="btn full">Sign in with Google</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
+
+
+
+<!-- ============================ -->
+<!-- dashboard.html (Main App) -->
+<!-- ============================ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daydream Design — Dashboard</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="header">
+  <img src="assets/logo.png" class="logo" />
+  <div class="header-text">
+      <h1 class="title">Daydream Design</h1>
+      <p class="subtitle">AI-Powered Interior Visualizer — Tap & Shop</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="card fade-in">
+    <h2>Upload Your Room</h2>
+    <input type="file" id="photo-input" accept="image/*" class="file-input"/>
+    <button id="upload-btn" class="btn" disabled>Generate Design</button>
+    <p class="muted">Upload a clear room photo (jpg/png)</p>
+  </section>
+
+  <section class="card fade-in">
+    <h2>Generated Preview</h2>
+    <div id="preview-wrap">
+      <canvas id="preview-canvas"></canvas>
+    </div>
+  </section>
+
+  <section class="card fade-in" id="products-card" style="display:none">
+    <h2>🛒 Suggested Products</h2>
+    <div id="product-list"></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <button id="logout" class="btn red">Logout</button>
+  <p>© Daydream Design</p>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>
+
+
+
+<!-- ============================ -->
+<!-- style.css -->
+<!-- ============================ -->
+/* Global */
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #d6c8ff, #f0eaff);
+  font-family: Arial, sans-serif;
+}
+.container {
+  width: 90%;
+  max-width: 900px;
+  margin: auto;
+}
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.btn {
+  background: #6C5CE7;
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn:hover { opacity: 0.8; }
+.btn.red { background: #e74c3c; }
+.full { width: 100%; }
+.muted { opacity: 0.7; }
+
+/* Header with Logo */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 25px 0;
+}
+.logo {
+  height: 75px;
+  width: 75px;
+  object-fit: contain;
+  border-radius: 50%;
+}
+.title { margin: 0; font-size: 2rem; }
+.subtitle { margin-top: 5px; opacity: 0.8; }
+
+/* Preview Canvas */
+#preview-canvas {
+  width: 100%;
+  border-radius: 10px;
+}
+
+/* Login Page */
+.login-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg,#c7b5ff,#efe6ff);
+}
+.login-card {
+  background: white;
+  padding: 35px;
+  border-radius: 20px;
+  width: 350px;
+  text-align: center;
+  box-shadow: 0 4px 25px rgba(0,0,0,0.15);
+}
+.login-logo {
+  height: 80px;
+  width: 80px;
+  object-fit: contain;
+  margin-bottom: 15px;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 20px;
+  opacity: 0.6;
+}
+
+
+
+<!-- ============================ -->
+<!-- app.js (Login Page Logic) -->
+<!-- ============================ -->
+// Firebase Config
+const firebaseConfig = {
+  apiKey: "<REPLACE>",
+  authDomain: "<REPLACE>.firebaseapp.com",
+  projectId: "<REPLACE>",
+  storageBucket: "<REPLACE>.appspot.com",
+  messagingSenderId: "<REPLACE>",
+  appId: "<REPLACE>"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+// Login
+const loginBtn = document.getElementById("google-login");
+loginBtn.onclick = () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).then(()=>{
+    window.location.href = "dashboard.html";
+  });
+};
+
+
+
+<!-- ============================ -->
+<!-- dashboard.js (Main Functionality) -->
+<!-- ============================ -->
+firebase.initializeApp(firebaseConfig);
+const storage = firebase.storage();
+
+const photoInput = document.getElementById("photo-input");
+const uploadBtn = document.getElementById("upload-btn");
+const logoutBtn = document.getElementById("logout");
+
+const canvas = document.getElementById("preview-canvas");
+const ctx = canvas.getContext("2d");
+const productsCard = document.getElementById("products-card");
+const productList = document.getElementById("product-list");
+
+let uploadedImage = null;
+
+auth.onAuthStateChanged(user => {
+  if(!user) window.location.href = "index.html";
+});
+
+logoutBtn.onclick = () => auth.signOut();
+
+photoInput.onchange = (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = new Image();
+    img.onload = () => {
+      uploadedImage = img;
+      canvas.width = 900;
+      const scale = canvas.width / img.width;
+      canvas.height = img.height * scale;
+      ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      uploadBtn.disabled = false;
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+};
+
+uploadBtn.onclick = () => {
+  simulateAI();
+};
+
+function simulateAI(){
+  ctx.fillStyle = "rgba(108,92,231,0.25)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  const spots = [
+    {title:"Modern Painting", query:"wall painting abstract", x:200,y:100,w:200,h:120},
+    {title:"Accent Sofa", query:"accent sofa", x:100,y:350,w:300,h:160}
+  ];
+
+  spots.forEach(h=>{
+    ctx.strokeStyle="#fff";
+    ctx.lineWidth=3;
+    ctx.strokeRect(h.x,h.y,h.w,h.h);
+  });
+
+  productsCard.style.display = "block";
+  productList.innerHTML = "";
+
+  spots.forEach(h=>{
+    const div = document.createElement("div");
+    div.className = "prod";
+    div.innerHTML = `<strong>${h.title}</strong><br>
+    <a href="https://www.amazon.in/s?k=${encodeURIComponent(h.query)}" target="_blank">Amazon</a> |
+    <a href="https://www.flipkart.com/search?q=${encodeURIComponent(h.query)}" target="_blank">Flipkart</a>`;
+    productList.appendChild(div);
+  });
+}
